@@ -62,7 +62,7 @@ namespace ColorVisor
                 res = tmp;
                 // System.Diagnostics.Debug.Print(res.ToString());
             }
-            SetText(resColor.name);
+            SetText(resColor.Name);
         }
 
         private void ColorGetHandler(object sender, ElapsedEventArgs elapsedEventArgs)
@@ -70,7 +70,6 @@ namespace ColorVisor
             Point cursor = new Point();
             GetCursorPos(ref cursor);
             var c = GetColorAt(cursor);
-            System.Diagnostics.Debug.Print(c.R + " " + c.G + " " + c.B);
             CalculateCloseColor(c);
             AdvColor.Color = c;
 

@@ -1,17 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Runtime.CompilerServices;
 
-namespace ColorVisor
+[assembly: InternalsVisibleTo("Tests")]
+
+namespace ColorVisor.Classes
 {
+    // http://www2.ece.rochester.edu/~gsharma/ciede2000/ciede2000noteCRNA.pdf
     static class ColorCalc
     {
         static readonly double TOLERANCE = 1e-7;
 
-        public static double DeltaE2000(AdvColor color_1, AdvColor color_2)
+        public static double DeltaE2000(AdvColor color1, AdvColor color2)
         {
-            double[] lab1 = color_1.Lab;
-            double[] lab2 = color_2.Lab;
+            double[] lab1 = color1.Lab;
+            double[] lab2 = color2.Lab;
 
             double L1 = lab1[0];
             double a1 = lab1[1];
