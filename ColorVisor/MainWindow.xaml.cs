@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Timers;
 using System.Windows;
 using System.Windows.Media;
+using ColorVisor.Classes;
 using Color = System.Drawing.Color;
 using Point = System.Drawing.Point;
 using Timer = System.Timers.Timer;
@@ -22,7 +23,7 @@ namespace ColorVisor
         public static extern int BitBlt(IntPtr hDc, int x, int y, int nWidth, int nHeight, IntPtr hSrcDc, int xSrc,
             int ySrc, int dwRop);
 
-        AdvColor AdvColor = AdvColor.CreateInstance(Color.Black);
+        private readonly AdvColor AdvColor = AdvColor.CreateInstance(Color.Black);
 
 
         public MainWindow()
@@ -30,6 +31,8 @@ namespace ColorVisor
             ResizeMode = ResizeMode.NoResize;
             SizeToContent = SizeToContent.WidthAndHeight;
             //Topmost = true;
+            // Initialize data structure
+            ColorsData.LoadData();
 
             InitializeComponent();
             myText.TextWrapping = TextWrapping.Wrap;
@@ -42,17 +45,17 @@ namespace ColorVisor
                 AutoReset = true,
                 Enabled = true
             };
-            timer.Elapsed += MouseCheck;
+            timer.Elapsed += ColorGetHandler;
         }
 
 
-        private void MouseCheck(object sender, ElapsedEventArgs elapsedEventArgs)
+        private void ColorGetHandler(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             Point cursor = new Point();
             GetCursorPos(ref cursor);
             var c = GetColorAt(cursor);
             AdvColor.Color = c;
-
+            
             SetText(AdvColor.Color);
             SetBackground(c);
         }

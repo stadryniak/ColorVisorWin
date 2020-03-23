@@ -5,6 +5,11 @@ namespace ColorVisor
 {
     class AdvColor
     {
+        public static AdvColor CreateInstance2(int r, int g, int b, string name)
+        {
+            return new AdvColor(r, g, b, name);
+        }
+
         public static AdvColor CreateInstance1(int r, int g, int b)
         {
             return new AdvColor(r, g, b);
@@ -15,6 +20,7 @@ namespace ColorVisor
             return new AdvColor(color);
         }
 
+        public string name { get; set; }
         private Color _color;
         public Color Color
         {
@@ -35,7 +41,7 @@ namespace ColorVisor
         private const double XyzEpsilon = 0.008856;
         private const double XyzKappa = 903.3;
 
-        private AdvColor(Color color)
+        public AdvColor(Color color)
         {
             _color = color;
             Xyz = new double[3];
@@ -44,13 +50,23 @@ namespace ColorVisor
             XyzToLab(Xyz[0], Xyz[1], Xyz[2]);
         }
 
-        private AdvColor(int r, int g, int b)
+        public AdvColor(int r, int g, int b)
         {
             _color = Color.FromArgb(r, g, b);
             Xyz = new double[3];
             Lab = new double[3];
             RgbToXyz(r, g, b);
             XyzToLab(Xyz[0], Xyz[1], Xyz[2]);
+        }
+
+        public AdvColor(int r, int g, int b, string name)
+        {
+            _color = Color.FromArgb(r, g, b);
+            Xyz = new double[3];
+            Lab = new double[3];
+            RgbToXyz(r, g, b);
+            XyzToLab(Xyz[0], Xyz[1], Xyz[2]);
+            this.name = name;
         }
 
         private void RgbToXyz(int r, int g, int b)
