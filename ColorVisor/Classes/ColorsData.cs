@@ -18,8 +18,14 @@ namespace ColorVisor.Classes
         public static void LoadData()
         {
             using var reader = new StreamReader(@"data.csv");
+            int c = 0;
             while (!reader.EndOfStream)
             {
+                if (c == 270)
+                {
+                    Console.WriteLine(c);
+                }
+                c++;
                 var line = reader.ReadLine();
                 if (line == null) break;
                 var val = line.Split(",");
@@ -30,11 +36,28 @@ namespace ColorVisor.Classes
 
         private static byte[] StringToByteArray(string hex)
         {
-            var numberChars = hex.Length;
-            var bytes = new byte[numberChars / 2];
-            for (var i = 0; i < numberChars; i += 2)
-                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
-            return bytes;
+            if (hex.Length % 2 == 1)
+                throw new Exception("The binary key cannot have an odd number of digits");
+
+            byte[] arr = new byte[hex.Length >> 1];
+
+            for (int i = 0; i < hex.Length >> 1; ++i)
+            {
+                arr[i] = (byte)((GetHexVal(hex[i << 1]) << 4) + (GetHexVal(hex[(i << 1) + 1])));
+            }
+
+            return arr;
+        }
+
+        public static int GetHexVal(char hex)
+        {
+            int val = (int)hex;
+            //For uppercase A-F letters:
+            //return val - (val < 58 ? 48 : 55);
+            //For lowercase a-f letters:
+            //return val - (val < 58 ? 48 : 87);
+            //Or the two combined, but a bit slower:
+            return val - (val < 58 ? 48 : (val < 97 ? 55 : 87));
         }
     }
 }

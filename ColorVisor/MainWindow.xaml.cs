@@ -39,7 +39,7 @@ namespace ColorVisor
             myText.TextWrapping = TextWrapping.Wrap;
             myText.IsReadOnly = true;
             myText.BorderThickness = new Thickness(0);
-            myText.FontSize = 20;
+            myText.FontSize = 15;
 
             var timer = new Timer(100)
             {
@@ -51,7 +51,7 @@ namespace ColorVisor
 
         private void CalculateCloseColor(Color currentColor)
         {
-            double res = 100;
+            double res = 10000000000;
             AdvColor resColor = AdvColor.CreateInstance(Color.Black);
             AdvColor current = AdvColor.CreateInstance(currentColor);
             foreach (var color in ColorsData.Colors)
@@ -60,6 +60,7 @@ namespace ColorVisor
                 if (!(res > tmp)) continue;
                 resColor = color;
                 res = tmp;
+                // System.Diagnostics.Debug.Print(res.ToString());
             }
             SetText(resColor.name);
         }
@@ -69,10 +70,11 @@ namespace ColorVisor
             Point cursor = new Point();
             GetCursorPos(ref cursor);
             var c = GetColorAt(cursor);
+            System.Diagnostics.Debug.Print(c.R + " " + c.G + " " + c.B);
             CalculateCloseColor(c);
             AdvColor.Color = c;
 
-           // SetText(AdvColor.Color);
+            // SetText(AdvColor.Color);
             SetBackground(c);
         }
 

@@ -89,7 +89,7 @@ namespace ColorVisor
             }
 
             // dHp
-            double dHp = 2 * Math.Sqrt(Cp1Cp2) * Math.Sin(ConvertToDegrees(dhp / 2));
+            double dHp = 2 * Math.Sqrt(Cp1Cp2) * Math.Sin(ConvertToRadians(dhp / 2));
 
             //step 3
             // L'Average
