@@ -4,10 +4,11 @@ using System.Text;
 
 namespace ColorVisor
 {
-    class ColorCalc
+    static class ColorCalc
     {
         static readonly double TOLERANCE = 1e-7;
-        static double DeltaE2000(AdvColor color_1, AdvColor color_2)
+
+        public static double DeltaE2000(AdvColor color_1, AdvColor color_2)
         {
             double[] lab1 = color_1.Lab;
             double[] lab2 = color_2.Lab;

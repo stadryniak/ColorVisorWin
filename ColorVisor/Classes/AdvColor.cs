@@ -5,12 +5,12 @@ namespace ColorVisor
 {
     class AdvColor
     {
-        public static AdvColor CreateInstance2(int r, int g, int b, string name)
+        public static AdvColor CreateInstance(int r, int g, int b, string name)
         {
             return new AdvColor(r, g, b, name);
         }
 
-        public static AdvColor CreateInstance1(int r, int g, int b)
+        public static AdvColor CreateInstance(int r, int g, int b)
         {
             return new AdvColor(r, g, b);
         }

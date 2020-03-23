@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Net.WebSockets;
 using System.Runtime.InteropServices;
 using System.Timers;
 using System.Windows;
@@ -24,7 +25,7 @@ namespace ColorVisor
             int ySrc, int dwRop);
 
         private readonly AdvColor AdvColor = AdvColor.CreateInstance(Color.Black);
-
+        private readonly Bitmap _screenPixel = new Bitmap(1, 1);
 
         public MainWindow()
         {
@@ -48,19 +49,35 @@ namespace ColorVisor
             timer.Elapsed += ColorGetHandler;
         }
 
+        private void CalculateCloseColor(Color currentColor)
+        {
+            double res = 100;
+            AdvColor resColor = AdvColor.CreateInstance(Color.Black);
+            AdvColor current = AdvColor.CreateInstance(currentColor);
+            foreach (var color in ColorsData.Colors)
+            {
+                double tmp = ColorCalc.DeltaE2000(color, current);
+                if (!(res > tmp)) continue;
+                resColor = color;
+                res = tmp;
+            }
+            SetText(resColor.name);
+        }
 
         private void ColorGetHandler(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             Point cursor = new Point();
             GetCursorPos(ref cursor);
             var c = GetColorAt(cursor);
+            CalculateCloseColor(c);
             AdvColor.Color = c;
-            
-            SetText(AdvColor.Color);
+
+           // SetText(AdvColor.Color);
             SetBackground(c);
         }
 
-        private readonly Bitmap _screenPixel = new Bitmap(1, 1);
+
+
 
         public Color GetColorAt(Point location)
         {
@@ -83,6 +100,11 @@ namespace ColorVisor
                     myText.Text = mColor.R + " " + mColor.G + " " + mColor.B;
                 }
             );
+        }
+
+        private void SetText(string str)
+        {
+            Dispatcher.Invoke(() => { myText.Text = str; });
         }
 
         private void SetBackground(Color color)
