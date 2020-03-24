@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Drawing;
+using System.IO.Enumeration;
 using System.Runtime.InteropServices;
 using System.Timers;
 using System.Windows;
 using System.Windows.Media;
 using ColorVisor.Classes;
+using Brushes = System.Drawing.Brushes;
 using Color = System.Drawing.Color;
 using Point = System.Drawing.Point;
 using Timer = System.Timers.Timer;
@@ -35,10 +37,15 @@ namespace ColorVisor
             ColorsData.LoadData();
 
             InitializeComponent();
-            myText.TextWrapping = TextWrapping.Wrap;
-            myText.IsReadOnly = true;
-            myText.BorderThickness = new Thickness(0);
-            myText.FontSize = 15;
+            // set text and button
+            MyText.TextWrapping = TextWrapping.Wrap;
+            MyText.IsReadOnly = true;
+            MyText.BorderThickness = new Thickness(0);
+            MyText.FontSize = 15;
+            MyText.TextAlignment = TextAlignment.Center;
+
+            // set button click listener
+            TopButton.Click += SetTopmost;
 
             var timer = new Timer(100)
             {
@@ -46,6 +53,11 @@ namespace ColorVisor
                 Enabled = true
             };
             timer.Elapsed += ColorGetHandler;
+        }
+
+        private void SetTopmost(object sender, RoutedEventArgs routedEventArgs)
+        {
+            Topmost = !Topmost;
         }
 
         private void CalculateCloseColor(Color currentColor)
@@ -76,10 +88,7 @@ namespace ColorVisor
             SetBackground(c);
         }
 
-
-
-
-        public Color GetColorAt(Point location)
+        private Color GetColorAt(Point location)
         {
             using (Graphics gdest = Graphics.FromImage(_screenPixel))
             {
@@ -97,14 +106,14 @@ namespace ColorVisor
         {
             Dispatcher.Invoke(() =>
                 {
-                    myText.Text = mColor.R + " " + mColor.G + " " + mColor.B;
+                    MyText.Text = mColor.R + " " + mColor.G + " " + mColor.B;
                 }
             );
         }
 
         private void SetText(string str)
         {
-            Dispatcher.Invoke(() => { myText.Text = str; });
+            Dispatcher.Invoke(() => { MyText.Text = str; });
         }
 
         private void SetBackground(Color color)
@@ -113,7 +122,18 @@ namespace ColorVisor
             {
                 var mColor = System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
                 Background = new SolidColorBrush(mColor);
-                myText.Background = new SolidColorBrush(mColor);
+                if (ColorCalc.DeltaE2000(new AdvColor(color), new AdvColor(Color.Black)) < 30)
+                {
+                    MyText.Foreground = System.Windows.Media.Brushes.White;
+                    TopButton.Foreground = System.Windows.Media.Brushes.White;
+                }
+                else
+                {
+                    MyText.Foreground = System.Windows.Media.Brushes.Black;
+                    TopButton.Foreground = System.Windows.Media.Brushes.Black;
+                }
+                MyText.Background = new SolidColorBrush(mColor);
+                TopButton.Background = new SolidColorBrush(mColor);
             });
         }
     }

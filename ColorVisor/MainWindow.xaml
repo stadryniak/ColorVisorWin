@@ -5,9 +5,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ColorVisor"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="ColorVisor" Height="450" Width="800">
+
     <Grid>
-        <TextBox x:Name="myText" Text="TextBox" TextWrapping="Wrap" HorizontalAlignment="Left" Width="164" Height="34" VerticalAlignment="Top"/>
+        <TextBox x:Name="MyText" Text="TextBox" TextWrapping="Wrap" HorizontalAlignment="Left" Width="164" Height="34" VerticalAlignment="Top"/>
+        <Button x:Name="TopButton" Content="On Top" HorizontalAlignment="Left" Margin="169,7,0,0" VerticalAlignment="Top">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="Background" Value="Green"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type Button}">
+                                <Border Background="{TemplateBinding Background}" BorderThickness="0">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Red"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
 
     </Grid>
 </Window>
