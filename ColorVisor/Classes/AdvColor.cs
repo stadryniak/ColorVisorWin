@@ -3,6 +3,10 @@ using System.Drawing;
 
 namespace ColorVisor.Classes
 {
+    /// <summary>
+    /// Class represents color as System.Drawing.Color, cieLAB, XYZ and it's name.
+    /// Name must be supplied by user.
+    /// </summary>
     public class AdvColor
     {
         public static AdvColor CreateInstance(int r, int g, int b, string name)
@@ -20,9 +24,10 @@ namespace ColorVisor.Classes
             return new AdvColor(color);
         }
 
+        // Color's name
         public string Name { get; set; }
+        // Color struct from windows
         private Color _color;
-
         public Color Color
         {
             get => _color;
@@ -33,9 +38,9 @@ namespace ColorVisor.Classes
                 XyzToLab(Xyz[0], Xyz[1], Xyz[2]);
             }
         }
-
+        // Xyz color array. 3 elements
         public double[] Xyz { get; }
-
+        // cieLAB color array. 3 elements
         private double[] _lab;
         public double[] Lab
         {
@@ -43,7 +48,7 @@ namespace ColorVisor.Classes
             set
             {
                 _lab = value;
-                LABToXYZ(_lab[0], _lab[1], _lab[2]);
+                LabToXyz(_lab[0], _lab[1], _lab[2]);
                 XyzToRgb(Xyz[0], Xyz[1], Xyz[2]);
             }
         }
@@ -79,17 +84,23 @@ namespace ColorVisor.Classes
             _lab = new double[3];
             RgbToXyz(r, g, b);
             XyzToLab(Xyz[0], Xyz[1], Xyz[2]);
-            this.Name = name;
+            Name = name;
         }
 
         public AdvColor(double l, double a, double b)
         {
             _lab = new[] { l, a, b };
             Xyz = new double[3];
-            LABToXYZ(l, a, b);
+            LabToXyz(l, a, b);
             XyzToRgb(Xyz[0], Xyz[1], Xyz[2]);
         }
 
+        /// <summary>
+        /// Convert color from RGB to XYZ.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="g"></param>
+        /// <param name="b"></param>
         private void RgbToXyz(int r, int g, int b)
         {
             double sr = r / 255.0;
@@ -104,6 +115,12 @@ namespace ColorVisor.Classes
             Xyz[2] = 100 * (sr * 0.0193 + sg * 0.1192 + sb * 0.9505);
         }
 
+        /// <summary>
+        /// Convert color from XYZ to cieLAB
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
         private void XyzToLab(double x, double y, double z)
         {
             x = PivotXyzComponent(x / XyzWhiteReferenceX);
@@ -119,7 +136,13 @@ namespace ColorVisor.Classes
             return component > XyzEpsilon ? Math.Pow(component, 1 / 3.0) : (XyzKappa * component + 16) / 116;
         }
 
-        private void LABToXYZ(double l, double a, double b)
+        /// <summary>
+        /// Converts cieLAB to XYZ
+        /// </summary>
+        /// <param name="l"></param>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        private void LabToXyz(double l, double a, double b)
         {
             double fy = (l + 16) / 116;
             double fx = a / 500 + fy;
@@ -137,6 +160,12 @@ namespace ColorVisor.Classes
             Xyz[2] = zr * XyzWhiteReferenceZ;
         }
 
+        /// <summary>
+        /// Convert XYZ to RGB
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
         private void XyzToRgb(double x, double y, double z)
         {
             double r = (x * 3.2406 + y * -1.5372 + z * -0.4986) / 100;
