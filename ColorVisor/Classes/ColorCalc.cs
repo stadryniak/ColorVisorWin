@@ -5,39 +5,50 @@ using System.Runtime.CompilerServices;
 
 namespace ColorVisor.Classes
 {
-    // http://www2.ece.rochester.edu/~gsharma/ciede2000/ciede2000noteCRNA.pdf
+    /// <summary>
+    /// Static class containing method to calculate dE2000 color distance
+    /// </summary>
     static class ColorCalc
     {
         static readonly double TOLERANCE = 1e-7;
 
+        /// <summary>
+        /// Calculates dE2000 distance betweeen colors
+        /// Reference:
+        /// http://www2.ece.rochester.edu/~gsharma/ciede2000/ciede2000noteCRNA.pdf
+        /// </summary>
+        /// <param name="color1">Color 1 to compare</param>
+        /// <param name="color2">Color 2 to compare</param>
+        /// <returns></returns>
         public static double DeltaE2000(AdvColor color1, AdvColor color2)
         {
+            // Setting variables
             double[] lab1 = color1.Lab;
             double[] lab2 = color2.Lab;
 
-            double L1 = lab1[0];
+            double l1 = lab1[0];
             double a1 = lab1[1];
             double b1 = lab1[2];
 
-            double L2 = lab2[0];
+            double l2 = lab2[0];
             double a2 = lab2[1];
             double b2 = lab2[2];
 
             //step 1:
             // C*ab = Sqrt(a* ^ 2 + b* ^ 2)
-            double CS_1 = Math.Sqrt(a1 * a1 + b1 * b1);
-            double CS_2 = Math.Sqrt(a2 * a2 + b2 * b2);
+            double cs1 = Math.Sqrt(a1 * a1 + b1 * b1);
+            double cs2 = Math.Sqrt(a2 * a2 + b2 * b2);
             // C*Average = (C*1 + C*2)/2
-            double CSAverage = (CS_1 + CS_2) / 2;
+            double csAverage = (cs1 + cs2) / 2;
             // G
-            double CSAverage7 = Math.Pow(CSAverage, 7);
-            double G = (1 - Math.Sqrt(CSAverage7 / (CSAverage7 + 6103515625.0))) / 2;
+            double csAverage7 = Math.Pow(csAverage, 7);
+            double g = (1 - Math.Sqrt(csAverage7 / (csAverage7 + 6103515625.0))) / 2;
             // a' = (1 + G) * a*
-            double ap1 = (1 + G) * a1;
-            double ap2 = (1 + G) * a2;
+            double ap1 = (1 + g) * a1;
+            double ap2 = (1 + g) * a2;
             // C' = Sqrt(a' ^ 2 + b* ^ 2)
-            double Cp1 = Math.Sqrt(ap1 * ap1 + b1 * b1);
-            double Cp2 = Math.Sqrt(ap2 * ap2 + b2 * b2);
+            double cp1 = Math.Sqrt(ap1 * ap1 + b1 * b1);
+            double cp2 = Math.Sqrt(ap2 * ap2 + b2 * b2);
             // h' = atan2(b*, a')
             double hp1;
             if (Math.Abs(b1) < TOLERANCE && Math.Abs(ap1) < TOLERANCE)
@@ -63,13 +74,13 @@ namespace ColorVisor.Classes
 
             //step 2
             // dLl
-            double dLp = L2 - L1;
+            double dLp = l2 - l1;
             // dCp
-            double dCp = Cp2 - Cp1;
+            double dCp = cp2 - cp1;
             // dhp
             double dhp;
-            double Cp1Cp2 = Cp1 * Cp2;
-            if (Cp1Cp2 == 0)
+            double cp1Cp2 = cp1 * cp2;
+            if (Math.Abs(cp1Cp2) < TOLERANCE)
             {
                 dhp = 0;
             }
@@ -91,16 +102,16 @@ namespace ColorVisor.Classes
             }
 
             // dHp
-            double dHp = 2 * Math.Sqrt(Cp1Cp2) * Math.Sin(ConvertToRadians(dhp / 2));
+            double dHp = 2 * Math.Sqrt(cp1Cp2) * Math.Sin(ConvertToRadians(dhp / 2));
 
             //step 3
             // L'Average
-            double LpAverage = (L1 + L2) / 2;
+            double lpAverage = (l1 + l2) / 2;
             // C'Average
-            double CpAverage = (Cp1 + Cp2) / 2;
+            double cpAverage = (cp1 + cp2) / 2;
             // h'Average
             double hpAverage;
-            if (Cp1Cp2 == 0)
+            if (Math.Abs(cp1Cp2) < TOLERANCE)
             {
                 hpAverage = hp1 + hp2;
             }
@@ -129,21 +140,21 @@ namespace ColorVisor.Classes
             // dTheta
             double dTheta = 30 * Math.Exp(-1 * ((hpAverage - 275) / 25) * ((hpAverage - 275) / 25));
             // Rc
-            double CpAverage7 = Math.Pow(CpAverage, 7);
-            double Rc = 2 * Math.Sqrt(CpAverage7 / (CpAverage7 + 6103515625.0));
+            double cpAverage7 = Math.Pow(cpAverage, 7);
+            double rc = 2 * Math.Sqrt(cpAverage7 / (cpAverage7 + 6103515625.0));
             // Sl
-            double LpAverageMinus50Square = (LpAverage - 50) * (LpAverage - 50);
-            double Sl = 1 + (0.015 * LpAverageMinus50Square) / (Math.Sqrt(20 + LpAverageMinus50Square));
+            double lpAverageMinus50Square = (lpAverage - 50) * (lpAverage - 50);
+            double sl = 1 + (0.015 * lpAverageMinus50Square) / (Math.Sqrt(20 + lpAverageMinus50Square));
             // Sc
-            double Sc = 1 + 0.045 * CpAverage;
+            double sc = 1 + 0.045 * cpAverage;
             // Sh
-            double Sh = 1 + 0.015 * CpAverage * T;
+            double sh = 1 + 0.015 * cpAverage * T;
             //Rt
-            double Rt = -1 * Math.Sin(ConvertToRadians(2 * dTheta)) * Rc;
+            double rt = -1 * Math.Sin(ConvertToRadians(2 * dTheta)) * rc;
 
             //Finally
-            return Math.Sqrt((dLp / Sl) * (dLp / Sl) + (dCp / Sc) * (dCp / Sc) + (dHp / Sh) * (dHp / Sh) +
-                             Rt * (dCp / Sc) * (dHp / Sh));
+            return Math.Sqrt((dLp / sl) * (dLp / sl) + (dCp / sc) * (dCp / sc) + (dHp / sh) * (dHp / sh) +
+                             rt * (dCp / sc) * (dHp / sh));
         }
 
         private static double ConvertToDegrees(double radians)
